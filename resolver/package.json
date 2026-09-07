@@ -2,7 +2,7 @@
   "name": "@unidpp/resolver-worker",
   "private": true,
   "version": "0.1.0",
-  "description": "UniDPP resolver service: KV-backed RFC 9264 linksets with per-context routing (EN 18222 / GB/T 33993 / UNTP renders), as-of stamps, and dark-identity no-information 404s. TODO #22.",
+  "description": "UniDPP resolver service: KV-backed RFC 9264 linksets with per-context routing (EN 18222 / GB/T 33993 / UNTP renders), as-of stamps, and dark-identity no-information 404s. .",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",

@@ -1,4 +1,4 @@
-// The demo seed linksets (TODO #22): the demo identities from
+// The demo seed linksets : the demo identities from
 // unidpp-resolver's fixtures (the TS test suite's four-link cast plus
 // the integration tests' GS1 identifiers), widened with the three
 // per-context render bindings this edge deployment demonstrates:

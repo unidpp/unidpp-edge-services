@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Seed the REMOTE resolver KV with the demo linksets + dark identity
-# (TODO #22). Idempotent: PUT overwrites. Run from the repo root:
+# . Idempotent: PUT overwrites. Run from the repo root:
 #   scripts/seed-resolver-remote.sh
 # Requires CLOUDFLARE_API_TOKEN (account UniDPP) — never commit it.
 set -euo pipefail

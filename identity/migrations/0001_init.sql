@@ -1,4 +1,4 @@
--- UniDPP identity — schema v1 (TODO #13).
+-- UniDPP identity — schema v1 .
 --
 -- Doctrine (adapted from oimlsmart/identity's org registry):
 --   - actors are the registry's first-class citizens: organizations and

@@ -1,4 +1,4 @@
--- Remote seed of the demo actors (TODO #13 / PLAN-OPERATORS §2.2 demo
+-- Remote seed of the demo actors ( / operator-model §2.2 demo
 -- cast) into the production D1. Idempotent: INSERT OR IGNORE.
 -- Values mirror identity/src/seed.ts exactly (the test suite's fixtures).
 

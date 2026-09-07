@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// The UniDPP resolver service — TODO #22 (resolver-deploy), deployed
+// The UniDPP resolver service —  (resolver-deploy), deployed
 // as resolve.unidpp.org. The Rust reference (unidpp-resolver) proven
 // surface, carried to the edge:
 //

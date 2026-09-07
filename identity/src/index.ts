@@ -1,9 +1,9 @@
 // ═══════════════════════════════════════════════════════════════════
-// The UniDPP identity service — TODO #13 (identity-server), deployed
+// The UniDPP identity service —  (identity-server), deployed
 // as identity.unidpp.org.
 //
 // The actor registry for UniDPP, adapting oimlsmart/identity's proven
-// patterns to PLAN-OPERATORS §2.2's role model:
+// patterns to operator-model §2.2's role model:
 //   - register actors (economic operators, installers, repairers,
 //     CABs, marketplaces) with catalog-checked roles;
 //   - issue scoped API credentials (audience + scope allowlist, the

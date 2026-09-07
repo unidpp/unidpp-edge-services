@@ -17,7 +17,7 @@
 // cross-PoP; the single-operator demo posture (one writer, TTL-free
 // small documents) keeps the window negligible, and every read path
 // is idempotent. A multi-region writer federation would move the ops
-// log to Durable Objects (the PLAN-OPERATORS §6 seam).
+// log to Durable Objects (the operator-model §6 seam).
 
 import type { EntryRouting, RequestContext } from './context'
 import { scoreEntry } from './context'

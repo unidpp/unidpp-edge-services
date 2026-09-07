@@ -1,6 +1,6 @@
 // The actor registry repository (adapted from oimlsmart/identity's
 // org-registry lifecycle): organizations and qualified persons as
-// first-class registry citizens, each carrying its PLAN-OPERATORS
+// first-class registry citizens, each carrying its the UniDPP operator model
 // §2.2 roles; active or disabled; never deleted (the registry's
 // history is the audit chain — a disabled actor is the guarded
 // retirement, the oimlsmart pattern).

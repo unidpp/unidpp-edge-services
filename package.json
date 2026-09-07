@@ -2,7 +2,7 @@
   "name": "unidpp-edge-services",
   "private": true,
   "version": "0.1.0",
-  "description": "UniDPP edge services on Cloudflare Workers: identity (actor registry, scoped API credentials) and resolver (RFC 9264 linksets with per-context routing). Implements TODO #13 (identity-server) and #22 (resolver-deploy) for the JTC 5 plenary readiness (PLAN-OPERATORS §2.2 role model; UNIDPP_PLAN.md §6 deployment map).",
+  "description": "UniDPP edge services on Cloudflare Workers: identity (actor registry, scoped API credentials) and resolver (RFC 9264 linksets with per-context routing). Implements  (identity-server) and #22 (resolver-deploy) for the JTC 5 plenary readiness (operator-model §2.2 role model; the UniDPP design framework §6 deployment map).",
   "type": "module",
   "workspaces": [
     "identity",

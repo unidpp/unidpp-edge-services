@@ -1,16 +1,16 @@
 // ═══════════════════════════════════════════════════════════════════
-// The role catalog — the identity service's model core (PLAN-OPERATORS
-// §2.2 adapted to TODO #13's registry scope).
+// The role catalog — the identity service's model core (the UniDPP operator model
+// §2.2 adapted to 's registry scope).
 //
 // Every actor kind names its roles; every role carries:
-//   - its PLAN-OPERATORS §2.2 anchor (the acting-rights source),
+//   - its operator-model §2.2 anchor (the acting-rights source),
 //   - the EN 18239-style class the credential maps to (the honest
 //     mapping: where the EN has no role of its own, the nearest §4
 //     stakeholder class is named AND the deviation is stated — never
 //     a silent fit),
 //   - the scope set: `defaultScopes` issued on a plain credential,
 //     `allowedScopes` the ceiling a narrowed credential may carry
-//     (least privilege at write, PLAN-OPERATORS §2.3's permission
+//     (least privilege at write, operator-model §2.3's permission
 //     matrices as the source of the verbs).
 //
 // OCP: adding a role = adding a catalog entry, never touching the
@@ -29,7 +29,7 @@ export type En18239Class =
   | 'dpp-service-provider'
   | 'espr-external-party'
 
-/** The registry's actor kinds (the five TODO #13 names the demo cast). */
+/** The registry's actor kinds (the five  names the demo cast). */
 export type ActorKind = 'economic-operator' | 'installer' | 'repairer' | 'cab' | 'marketplace'
 
 export const ACTOR_KINDS: readonly ActorKind[] = [
@@ -47,7 +47,7 @@ export function isActorKind(value: unknown): value is ActorKind {
 /** One role of the catalog. */
 export interface RoleDefinition {
   key: string
-  /** The PLAN-OPERATORS §2.2 anchor this role's acting rights come from. */
+  /** The operator-model §2.2 anchor this role's acting rights come from. */
   planOperators: string
   /** The EN 18239-style class mapping (§4 stakeholder vocabulary). */
   en18239: { class: En18239Class; subkind?: string; note?: string }
@@ -101,7 +101,7 @@ export const ACTOR_KIND_CATALOG: Readonly<Record<ActorKind, ActorKindDefinition>
   'economic-operator': {
     kind: 'economic-operator',
     description:
-      'Economic operator (PLAN-OPERATORS §2.2-1..2): the top-level EN 18239 §4.1 role — manufacturer, authorized representative, importer, distributor, dealer, fulfilment service provider.',
+      'Economic operator (operator-model §2.2-1..2): the top-level EN 18239 §4.1 role — manufacturer, authorized representative, importer, distributor, dealer, fulfilment service provider.',
     roles: [
       eoRole('manufacturer', '§2.2-1', EO_SCOPES.manufacturer),
       eoRole('authorized-representative', '§2.2-1 (mandate posture)', EO_SCOPES.distributor),
@@ -113,7 +113,7 @@ export const ACTOR_KIND_CATALOG: Readonly<Record<ActorKind, ActorKindDefinition>
   },
   installer: {
     kind: 'installer',
-    description: 'Installer (PLAN-OPERATORS §2.2-9): R3 install/uninstall events with re-identification records.',
+    description: 'Installer (operator-model §2.2-9): R3 install/uninstall events with re-identification records.',
     roles: [
       {
         key: 'installer',
@@ -130,7 +130,7 @@ export const ACTOR_KIND_CATALOG: Readonly<Record<ActorKind, ActorKindDefinition>
   repairer: {
     kind: 'repairer',
     description:
-      'Repairer (PLAN-OPERATORS §2.2-10): authorized, independent, or DIY — E2/E3 repair and maintenance events under right-to-repair profile rules (the EN 18239 role analog).',
+      'Repairer (operator-model §2.2-10): authorized, independent, or DIY — E2/E3 repair and maintenance events under right-to-repair profile rules (the EN 18239 role analog).',
     roles: [
       {
         key: 'repairer:authorized',
@@ -151,7 +151,7 @@ export const ACTOR_KIND_CATALOG: Readonly<Record<ActorKind, ActorKindDefinition>
   cab: {
     kind: 'cab',
     description:
-      'Conformity assessment body / test laboratory (PLAN-OPERATORS §2.2-17): measurement-class events with method, GUM uncertainty and registered units.',
+      'Conformity assessment body / test laboratory (operator-model §2.2-17): measurement-class events with method, GUM uncertainty and registered units.',
     roles: [
       {
         key: 'cab:test-laboratory',
@@ -169,7 +169,7 @@ export const ACTOR_KIND_CATALOG: Readonly<Record<ActorKind, ActorKindDefinition>
   marketplace: {
     kind: 'marketplace',
     description:
-      'Marketplace operator (PLAN-OPERATORS §2.2-20): runs predicates, not copies — listing gates evaluate registered predicates without holding passport data; serves consumer presentation renders.',
+      'Marketplace operator (operator-model §2.2-20): runs predicates, not copies — listing gates evaluate registered predicates without holding passport data; serves consumer presentation renders.',
     roles: [
       {
         key: 'marketplace:operator',

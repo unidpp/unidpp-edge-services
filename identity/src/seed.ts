@@ -1,4 +1,4 @@
-// The demo actor seed (PLAN-OPERATORS §2.2 demo cast, mapped to the
+// The demo actor seed (operator-model §2.2 demo cast, mapped to the
 // registry's five kinds). Exposed as plain data so the deploy script
 // and the test suite seed the same fixtures — single source of truth.
 
