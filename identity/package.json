@@ -1,0 +1,19 @@
+{
+  "name": "@unidpp/identity-worker",
+  "private": true,
+  "version": "0.1.0",
+  "description": "UniDPP identity service: the actor registry (PLAN-OPERATORS §2.2 role catalog), scoped API credential issuance, EN 18239-style role-class mapping. D1 storage, ES256-signed responses.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.1.4",
+    "@types/node": "^22.20.1",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.129.0"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "unidpp-identity",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "account_id": "af1920686175ca6d92a677e02bdda75d",
+  "workers_dev": false,
+  "observability": {
+    "enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "identity.unidpp.org",
+      "custom_domain": true
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "unidpp-identity-db",
+      "database_id": "4b5adbe5-5868-420a-a39d-4a963c248fe6",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

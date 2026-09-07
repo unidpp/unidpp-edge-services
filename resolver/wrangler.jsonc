@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "unidpp-resolver",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "account_id": "af1920686175ca6d92a677e02bdda75d",
+  "workers_dev": false,
+  "observability": {
+    "enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "resolve.unidpp.org",
+      "custom_domain": true
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "LINKSETS",
+      "id": "b499e7779f3e47bf90e4cffb13ff420f"
+    }
+  ]
+}
