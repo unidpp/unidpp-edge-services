@@ -200,6 +200,72 @@ describe('per-context routing (the three demo contexts)', () => {
   })
 })
 
+// ---------------------------------------------------------------------------
+// Accept-header content negotiation (discovery protocol C4)
+// ---------------------------------------------------------------------------
+
+describe('accept-header negotiation (discovery protocol C4)', () => {
+  it('routes three Accept headers to three distinct render destinations, each stamped x-as-of', async () => {
+    await seedIsoDemo()
+    const identifier = encodeURIComponent(ISO_IDENTIFIER)
+    const cases: ReadonlyArray<readonly [string, string, string]> = [
+      ['application/untp+json', 'https://dpp.unidpp.org/untp/84120099012345', 'role=machine'],
+      ['application/en18222+json', 'https://dpp.unidpp.org/eu/84120099012345', 'role=customs'],
+      ['text/html', 'https://dpp-jp.meti.example.go.jp/passport/84120099012345', 'role=consumer'],
+    ]
+    const destinations = new Set<string>()
+    for (const [accept, uri, context] of cases) {
+      const response = await get(`/resolve?identifier=${identifier}`, { headers: { Accept: accept } })
+      expect(response.status, accept).toBe(200)
+      const links = await linksOf(response)
+      expect(links[0]!['uri'], accept).toBe(uri)
+      expect(response.headers.get('link'), accept).toBe(`<${uri}>; rel="dpp"`)
+      expect(response.headers.get('x-unidpp-context'), accept).toBe(`profile=*;${context};lang=*;region=*`)
+      expect(response.headers.get('x-as-of'), accept).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)
+      destinations.add(uri)
+    }
+    expect(destinations.size).toBe(3)
+  })
+
+  it('explicit context parameters outrank the accept header', async () => {
+    await seedIsoDemo()
+    const identifier = encodeURIComponent(ISO_IDENTIFIER)
+    const response = await get(`/resolve?identifier=${identifier}&role=recycler`, {
+      headers: { Accept: 'application/untp+json' },
+    })
+    const links = await linksOf(response)
+    expect(links[0]!['uri']).toContain('/recycler/')
+    expect(response.headers.get('x-unidpp-context')).toBe('profile=*;role=recycler;lang=*;region=*')
+    // An unoffered media type leaves plain no-context resolution in place.
+    const plain = await get(`/resolve?identifier=${identifier}`, { headers: { Accept: 'application/xml' } })
+    expect(plain.headers.get('x-unidpp-context')).toBeNull()
+  })
+
+  it('negotiates the path-form redirect too', async () => {
+    const item = DEMO_LINKSETS[1]!
+    await post('/admin/linksets', { identifier: item.identifier, links: item.links }, 'PUT')
+    const redirect = await get('/01/06901234567892/21/AB2026111', {
+      redirect: 'manual',
+      headers: { Accept: 'application/untp+json' },
+    })
+    expect(redirect.status).toBe(303)
+    expect(redirect.headers.get('location')).toBe('https://dpp.unidpp.org/untp/06901234567892')
+    expect(redirect.headers.get('x-as-of')).toBeTruthy()
+  })
+
+  it('x-as-of derives from the linkset generation timestamp, not the request instant', async () => {
+    await seedIsoDemo()
+    const view = await get('/admin/identifiers/' + encodeURIComponent(ISO_IDENTIFIER))
+    const doc = (await view.json()) as { updatedAt: string }
+    expect(doc.updatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+    const live = await get(`/resolve?identifier=${encodeURIComponent(ISO_IDENTIFIER)}`)
+    expect(live.headers.get('x-as-of')).toBe(doc.updatedAt)
+    // Historical reconstruction still stamps the requested instant.
+    const past = await get(`/resolve?identifier=${encodeURIComponent(ISO_IDENTIFIER)}&asof=2030-01-01T00:00:00Z`)
+    expect(past.headers.get('x-as-of')).toBe('2030-01-01T00:00:00Z')
+  })
+})
+
 describe('as-of stamps (I13)', () => {
   it('stamps every response with the effective instant', async () => {
     await seedIsoDemo()

@@ -47,7 +47,7 @@ interface EntriesDocument {
 export type Lookup =
   | { kind: 'absent' }
   | { kind: 'dark' }
-  | { kind: 'resolved'; entries: LinkEntry[] }
+  | { kind: 'resolved'; entries: LinkEntry[]; updatedAt: string }
 
 export interface OpRecord {
   seq: number
@@ -211,14 +211,15 @@ export class LinkStore {
     return next
   }
 
-  /** The public lookup: absent, dark, or resolved (I12: dark and
+  /** The public lookup: absent, dark, or resolved with the effective
+   *  entries and the document's generation timestamp (I12: dark and
    *  absent are indistinguishable downstream — the caller answers
    *  both with the byte-identical 404). */
   async lookup(key: string, atMs: number): Promise<Lookup> {
     const doc = await this.readDocument(key)
     if (doc === null) return { kind: 'absent' }
     if (doc.dark) return { kind: 'dark' }
-    return { kind: 'resolved', entries: doc.entries.filter((e) => entryValidAt(e, atMs)) }
+    return { kind: 'resolved', entries: doc.entries.filter((e) => entryValidAt(e, atMs)), updatedAt: doc.updatedAt }
   }
 
   async register(key: string, entries: LinkEntry[]): Promise<{ doc: EntriesDocument; record: OpRecord }> {

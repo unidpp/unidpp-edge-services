@@ -8,6 +8,10 @@
 //     matches over wildcards, primary-subtag language fallback —
 //     eu-customs → EN 18222 render, jp-consumer → GB/T 33993 render,
 //     machine → UNTP render (the seed dataset demonstrates all three);
+//   - Accept-header content negotiation (discovery protocol C4):
+//     application/untp+json / application/en18222+json / text/html
+//     route the default destination to the matching render entry when
+//     the request carries no explicit context parameters;
 //   - as-of stamps on every response (I13) and as-of reconstruction
 //     via the `asof` query parameter;
 //   - dark identities: absent-from-KV and dark return the SAME
@@ -21,8 +25,9 @@
 import { parseCarrier, parseIdentifierParam, type ResolvedIdentifier } from './carrier'
 import { contextKey, isContextEmpty, type RequestContext } from './context'
 import type { Link } from './linkset'
+import { ACCEPT_CONTEXTS, contextForAccept } from './negotiate'
 import { LinkStore, linkEntryFromAdmin, selectOrdered, type LinkEntry } from './store'
-import { nowRfc3339, parseRfc3339 } from './time'
+import { nowRfc3339, parseRfc3339, toRfc3339 } from './time'
 
 export interface Env {
   LINKSETS: KVNamespace
@@ -142,16 +147,23 @@ function linkTypeOf(params: URLSearchParams): string {
 // The resolution core
 // ---------------------------------------------------------------------------
 
-async function resolve(env: Env, ident: ResolvedIdentifier, ctx: RequestContext, linkType: string, atMs: number | null, redirect: boolean): Promise<Response> {
+async function resolve(env: Env, ident: ResolvedIdentifier, ctx: RequestContext, accept: string | null, linkType: string, atMs: number | null, redirect: boolean): Promise<Response> {
   const store = new LinkStore(env.LINKSETS)
   const tMs = atMs ?? Date.now()
-  const asOf = atMs !== null ? new Date(atMs).toISOString().replace(/\.\d{3}Z$/, 'Z') : nowRfc3339()
   const lookup = await store.lookup(ident.key, tMs)
   if (lookup.kind !== 'resolved') return notFound()
   if (lookup.entries.length === 0) return notFound()
+  // Discovery-protocol content negotiation (C4): an Accept header
+  // naming a known render media type routes the default destination
+  // when the request carries no explicit context parameters.
+  const effectiveCtx: RequestContext = isContextEmpty(ctx) ? (contextForAccept(accept) ?? ctx) : ctx
+  // I13: every response is as-of stamped. Explicit historical queries
+  // stamp the requested instant; live responses stamp the linkset's
+  // generation timestamp (the store's own — never minted here).
+  const asOf = atMs !== null ? toRfc3339(atMs) : lookup.updatedAt
   return redirect
-    ? renderRedirect(lookup.entries, ctx, linkType, asOf)
-    : renderLinksetResponse(ident.anchor, lookup.entries, ctx, linkType, asOf)
+    ? renderRedirect(lookup.entries, effectiveCtx, linkType, asOf)
+    : renderLinksetResponse(ident.anchor, lookup.entries, effectiveCtx, linkType, asOf)
 }
 
 // ---------------------------------------------------------------------------
@@ -261,6 +273,11 @@ function discoveryPayload(url: URL): Record<string, unknown> {
         'jp-consumer': { profile: 'urn:unidpp:profile:jp-meti-pse', role: 'consumer', lang: 'ja', region: 'JP', render: 'GB/T 33993' },
         machine: { role: 'machine', render: 'UNTP verifiable credential' },
       },
+      contentNegotiation: {
+        header: 'Accept',
+        rule: 'the most preferred offered media type routes the default link when the request carries no explicit context parameters',
+        mediaTypes: ACCEPT_CONTEXTS.map((row) => ({ mediaType: row.mediaType, context: `role=${row.role}` })),
+      },
     },
     endpoints: {
       resolve: `${origin}/resolve?identifier=…`,
@@ -316,7 +333,7 @@ export default {
         }
         const { atMs, error: asofError } = asOfFromParams(params)
         if (asofError !== null) return badRequest(asofError)
-        return resolve(env, ident, contextFromParams(params), linkTypeOf(params), atMs, false)
+        return resolve(env, ident, contextFromParams(params), request.headers.get('accept'), linkTypeOf(params), atMs, false)
       }
 
       if (path === '/admin/linksets' && (method === 'POST' || method === 'PUT')) {
@@ -407,7 +424,7 @@ export default {
         if (ident === null) return notFound()
         const { atMs, error: asofError } = asOfFromParams(url.searchParams)
         if (asofError !== null) return badRequest(asofError)
-        return resolve(env, ident, contextFromParams(url.searchParams), linkTypeOf(url.searchParams), atMs, !wantLinkset)
+        return resolve(env, ident, contextFromParams(url.searchParams), request.headers.get('accept'), linkTypeOf(url.searchParams), atMs, !wantLinkset)
       }
 
       return notFound()
