@@ -2,9 +2,8 @@
 
 Cloudflare Workers for the UniDPP discovery registry (operator-model §1, §6):
 an **identity** worker (actor registry + scoped API credentials) and a
-**resolver** worker (RFC 9264 linksets with per-context routing) —
-**** and **** of the JTC 5 plenary readiness plan, deployed
-to `identity.unidpp.org` and `resolve.unidpp.org`.
+**resolver** worker (RFC 9264 linksets with per-context routing),
+deployed to `identity.unidpp.org` and `resolve.unidpp.org`.
 
 The design adapts two proven reference surfaces:
 
@@ -17,7 +16,12 @@ The design adapts two proven reference surfaces:
  — RFC 9264 linksets, the context-scoring table (exact > primary-subtag
  fallback > specific-no-pref > wildcard, mismatch kills), the GS1
  Digital Link and GB/T 33993 carrier grammars, dark-identity 404
- indistinguishability (I12), the as-of stamp doctrine (I13).
+ indistinguishability (I12), the as-of stamp doctrine (I13),
+ Accept-header content negotiation (discovery protocol C4:
+ `application/untp+json` / `application/en18222+json` / `text/html`
+ route the default link when the request carries no explicit context
+ parameters), and generation-stamp `x-as-of` (a live resolution stamps
+ the linkset document's own `updatedAt`, never a minted now()).
 
 ## Layout
 
@@ -39,6 +43,7 @@ unidpp-edge-services/
  src/
  index.ts fetch router
  context.ts the context scoring table (port of @unidpp/resolver)
+ negotiate.ts Accept-header media-type -> routing-context table (C4)
  linkset.ts RFC 9264 emit/parse
  carrier.ts GS1 DL + GB/T + ISO 15459 carrier normalization
  gs1.ts GS1 check-digit math
@@ -57,7 +62,7 @@ npm run dev:identity # wrangler dev in identity/
 npm run dev:resolver # wrangler dev in resolver/
 ```
 
-## Deploy ( + #13 + operator-model §6)
+## Deploy (operator-model §6)
 
 Done 2026-09-07 (account `UniDPP` `af1920686175ca6d92a677e02bdda75d`, zone
 `unidpp.org` `5912805a2be5db3c5070e4063746de9e`):
